@@ -1,0 +1,56 @@
+### LLaMA Factory 训练配置 - A100 优化版
+### 使用方法: llamafactory-cli train train_config_a100.yaml
+
+### 模型配置
+model_name_or_path: Qwen/Qwen3-8B
+trust_remote_code: true
+
+### 训练方法
+stage: sft
+do_train: true
+finetuning_type: lora
+
+### 量化配置（A100 可以用 8-bit 或不量化，但 4-bit 性价比最高）
+quantization_bit: 4
+quantization_method: bitsandbytes
+
+### LoRA 配置 - A100 优化版
+lora_rank: 64              # 从 8 提升到 64，更强的表达能力
+lora_alpha: 128            # 通常设为 rank 的 2 倍
+lora_dropout: 0.05
+lora_target: all
+
+### 数据配置
+dataset: lca_data
+template: qwen3
+cutoff_len: 28000          # 完整保留所有数据
+preprocessing_num_workers: 8
+
+### 训练参数 - A100 优化版
+output_dir: saves/Qwen3-8B/lora/lca_lora_a100
+overwrite_output_dir: true
+per_device_train_batch_size: 2      # 从 1 提升到 2
+gradient_accumulation_steps: 8      # 等效 batch size = 16
+learning_rate: 1.0e-4               # 稍微降低，更稳定
+num_train_epochs: 5.0               # 从 3 提升到 5
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+logging_steps: 5
+save_steps: 50
+save_total_limit: 5
+
+### 优化配置
+bf16: true
+gradient_checkpointing: true
+ddp_timeout: 180000000
+optim: adamw_torch
+
+### 验证配置
+val_size: 0.1
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 50
+
+### SwanLab 可视化
+report_to: swanlab
+run_name: lca_llm_qwen3_lora_a100

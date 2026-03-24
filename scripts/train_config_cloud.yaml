@@ -1,0 +1,58 @@
+### LLaMA Factory 训练配置 - 云服务器版（保守参数）
+### 使用方法: llamafactory-cli train train_config_cloud.yaml
+
+### 模型配置
+model_name_or_path: /root/models/Qwen3-8B
+trust_remote_code: true
+
+### 训练方法
+stage: sft
+do_train: true
+finetuning_type: lora
+
+### 量化配置
+quantization_bit: 4          
+quantization_method: bitsandbytes
+
+# 开启 unsloth
+use_unsloth: true
+
+### LoRA 配置 - LLaMA Factory 默认值
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.0
+lora_target: q_proj,v_proj,k_proj,o_proj
+
+### 数据配置
+dataset: lca_data_filtered
+template: qwen3
+cutoff_len: 22000              
+
+### 训练参数 - LLaMA Factory 默认值
+output_dir: saves/Qwen3-8B/lora/lca_lora
+overwrite_output_dir: true
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8  
+learning_rate: 5.0e-5           
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+logging_steps: 10
+save_steps: 100
+save_total_limit: 3
+
+### 优化配置
+bf16: true
+flash_attn: fa2
+gradient_checkpointing: true
+optim: adamw_8bit
+
+### 验证配置
+val_size: 0.07
+per_device_eval_batch_size: 1
+eval_strategy: steps
+eval_steps: 100
+
+### SwanLab 可视化
+report_to: swanlab
+run_name: lca_llm_finetune
